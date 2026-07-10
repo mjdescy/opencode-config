@@ -34,8 +34,35 @@
   // ---------------------------------------------------------------
   // Agents
   // ---------------------------------------------------------------
-  // Specialised agents you can invoke for specific tasks.
   "agent": {
+    "deepseek-flash": {
+      "description": "Primary agent. Fast, cheap orchestration for routine engineering work.",
+      "mode": "primary",
+      "model": "opencode-go/deepseek-v4-flash",
+      "steps": 30
+    },
+    "glm-advisor": {
+      "description": "Strategic advisor for second opinions, plan critique, and architecture tradeoffs.",
+      "mode": "subagent",
+      "hidden": true,
+      "model": "opencode-go/glm-5.2",
+      "steps": 15,
+      "temperature": 0.3,
+      "prompt": "{file:prompts/glm-advisor.md}",
+      "permission": {
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "webfetch": "allow",
+        "edit": "deny",
+        "write": "deny",
+        "bash": "deny",
+        "task": "deny",
+        "question": "allow",
+        "todowrite": "deny"
+      }
+    },
     "research": {
       "description": "Finds answers in official .NET docs, MSDN, and canonical sources",
       "model": "opencode-go/deepseek-v4-flash",
@@ -135,7 +162,7 @@
   },
 
   // Default agent to use when none is specified
-  "default_agent": "build",
+  "default_agent": "deepseek-flash",
 
   // ---------------------------------------------------------------
   // Custom Slash Commands
