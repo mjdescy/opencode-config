@@ -198,13 +198,17 @@
   // Control which tools require explicit user approval.
   // "allow" = auto-approve, "ask" = prompt user, "deny" = block.
   "permission": {
-    "edit": "ask",
+    "edit": "allow",
     "bash": {
       "*": "ask",
+      "cargo *": "allow",
       "dotnet *": "allow",
-      "grep *": "allow"
+      "git *": "allow",
+      "grep *": "allow",
+      "mkdir *": "allow",
+      "nu *": "allow"
     },
-    "write": "ask"
+    "write": "allow"
   },
 
   // ---------------------------------------------------------------
