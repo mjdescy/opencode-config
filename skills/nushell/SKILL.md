@@ -58,7 +58,8 @@ def save-results [data: list] {
 - Prefer structured data (records, lists, tables) over string parsing
 - Use `each`, `where`, `select`, `group-by`, `sort-by` over raw loops
 - Use `try`/`catch` for known-fallible operations
-- Use `rm --force` over `rm`
+- Fail early with guard clauses to keep the happy path unindented: validate inputs at the top, then proceed without nesting
+- Always prefix external commands with `^` (e.g., `^rg`, `^git`, `^ls`) to avoid ambiguity with Nushell internal commands
 
 ```nushell
 def process-file [path: path, --dry-run] {
@@ -110,15 +111,44 @@ def main [--input-path: path, --output-path: path] {
 
 ## Testing
 
-- Use `nu --test` or inline test commands with `#[test]` attribute (Nushell 0.98+)
-- Write small helper commands that return data for easy assertion
+- Use `nu --test` (Nushell 0.98+) — it discovers all commands annotated with `#[test]` and runs them, reporting pass/fail per test
+- Name test commands `test_<description>` for discoverability
+- Group tests at the bottom of the file, mirroring the commands they test
+- Cover happy path and edge cases (empty input, missing file, invalid data) in separate tests
 
-## Tooling
+### Assertions
 
 | Command | Purpose |
 |---------|---------|
-| `nu -c "..."` | Run inline script |
-| `nu script.nu` | Run a script file |
-| `nu --commands "..."` | Run commands and exit |
-| `nu --stdin` | Read input from stdin |
-| `nu --test` | Run tests in script |
+| `assert` | Assert a condition is true |
+| `assert equal` | Assert two values are equal |
+| `assert not equal` | Assert two values differ |
+| `assert greater` | Assert left > right |
+| `assert greater or equal` | Assert left >= right |
+| `assert less` | Assert left < right |
+| `assert less or equal` | Assert left <= right |
+| `assert length` | Assert a list/table has N elements |
+| `assert str contains` | Assert a string contains a substring |
+| `assert error` | Assert a block raises an error |
+
+### Example
+
+```nushell
+#[test]
+def test_process_data_transforms_rows [] {
+    let input = [{ name: "alice", value: "42" }]
+    let actual = process-data $input
+    assert equal $actual [{ name: "Alice", value: 42 }]
+}
+
+#[test]
+def test_process_data_handles_empty_list [] {
+    let actual = process-data []
+    assert equal $actual []
+}
+
+#[test]
+def test_load_data_errors_on_missing_file [] {
+    assert error { load-data "nonexistent.json" }
+}
+```
