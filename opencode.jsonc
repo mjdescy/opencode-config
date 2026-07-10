@@ -77,7 +77,7 @@
     "dotnet-code-reviewer": {
       "description": "Reviews C# code for conventions, security, performance, and maintainability",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode-go/deepseek-v4-pro",
       "prompt": "You are a C# code reviewer. Review code against these conventions: PascalCase types/methods, _camelCase private fields, I-prefixed interfaces, file-scoped namespaces, primary constructors (C# 12+), expression-bodied members for single-line methods, pattern matching over if-is-cast chains, record types for immutable data, System.Text.Json over Newtonsoft. Flag: #region usage, magic numbers/strings, missing readonly, 'Utility'/'Helper' class names, out/ref parameters, methods with >3 parameters. Also check for security issues (SQL injection, hardcoded secrets), performance (boxing, unnecessary allocations, async void), and maintainability (long methods, deep nesting, missing XML docs on public APIs).",
       "tools": {
         "write": false,
@@ -109,7 +109,7 @@
     "dotnet-refactor": {
       "description": "Applies C# conventions and modernizes code without changing behavior",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode-go/deepseek-v4-pro",
       "prompt": "You are a C# refactoring specialist. Modernize code to follow these conventions WITHOUT changing external behavior: file-scoped namespaces, primary constructors (C# 12+), expression-bodied members for single-line methods/properties, pattern matching instead of if-is-cast chains, collection expressions (`[1, 2, 3]`), null-conditional operators (`?.`, `??`, `??=`), `init` over `set`, `readonly` where possible, `record`/`readonly struct` for value types. Remove: #region blocks, magic numbers (extract named constants), 'Utility'/'Helper' suffixes, out/ref parameters (use tuples). Keep methods small (≤3 parameters; introduce parameter objects if needed). Always run `dotnet build` after refactoring to verify no breaks.",
       "tools": {
         "write": true,
@@ -208,7 +208,12 @@
       "git *": "allow",
       "grep *": "allow",
       "mkdir *": "allow",
-      "nu *": "allow"
+      "nu *": "allow",
+      "opencode *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "ls *": "allow",
+      "cat *": "allow"
     },
     "write": "allow"
   },
