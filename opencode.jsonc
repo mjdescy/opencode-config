@@ -199,23 +199,110 @@
   // ---------------------------------------------------------------
   // Control which tools require explicit user approval.
   // "allow" = auto-approve, "ask" = prompt user, "deny" = block.
+  //
+  // Rules use last-matching-wins semantics, so "*": "ask" is first
+  // and specific allow rules follow — the specific rules win.
   "permission": {
+    // Tool-level permissions (non-bash tools)
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "webfetch": "allow",
     "edit": "allow",
+    "write": "allow",
+
+    // Bash command-level permissions
+    // "*": "ask" acts as a safety net for anything explicitly destructive.
+    // Every non-destructive command commonly used by agents gets auto-allowed.
     "bash": {
+      // Catch-all: anything not matched below will prompt
       "*": "ask",
-      "cargo *": "allow",
+
+      // === Build & test commands ===
       "dotnet *": "allow",
-      "git *": "allow",
-      "grep *": "allow",
-      "mkdir *": "allow",
-      "nu *": "allow",
-      "opencode *": "allow",
+      "cargo *": "allow",
+      "npm *": "allow",
+      "npx *": "allow",
+      "pnpm *": "allow",
+      "bun *": "allow",
+      "make *": "allow",
+      "just *": "allow",
+
+      // === File reading & searching ===
+      "cat *": "allow",
       "head *": "allow",
       "tail *": "allow",
       "ls *": "allow",
-      "cat *": "allow"
-    },
-    "write": "allow"
+      "grep *": "allow",
+      "rg *": "allow",
+      "find *": "allow",
+      "fd *": "allow",
+      "wc *": "allow",
+      "file *": "allow",
+      "sort *": "allow",
+      "uniq *": "allow",
+      "jq *": "allow",
+      "strings *": "allow",
+      "diff *": "allow",
+      "comm *": "allow",
+      "cut *": "allow",
+      "paste *": "allow",
+      "tr *": "allow",
+      "od *": "allow",
+      "xxd *": "allow",
+      "hexdump *": "allow",
+
+      // === Process & system info (read-only) ===
+      "which *": "allow",
+      "type *": "allow",
+      "command *": "allow",
+      "hash *": "allow",
+      "pwd": "allow",
+      "echo *": "allow",
+      "printf *": "allow",
+      "printenv": "allow",
+      "env": "allow",
+      "date": "allow",
+      "whoami": "allow",
+      "id": "allow",
+      "hostname": "allow",
+      "uname *": "allow",
+      "ps *": "allow",
+      "lsof *": "allow",
+
+      // === Network (read-only) ===
+      "curl *": "allow",
+      "wget *": "allow",
+      "ping *": "allow",
+      "nslookup *": "allow",
+      "dig *": "allow",
+      "ss *": "allow",
+      "netstat *": "allow",
+
+      // === Directory operations ===
+      "mkdir *": "allow",
+      "rmdir *": "allow",
+      "realpath *": "allow",
+      "readlink *": "allow",
+      "dirname *": "allow",
+      "basename *": "allow",
+      "tree *": "allow",
+
+      // === Git ===
+      "git *": "allow",
+
+      // === Shell scripting ===
+      "nu *": "allow",
+      "bash *": "allow",
+      "sh *": "allow",
+      "zsh *": "allow",
+      "source *": "allow",
+      ".": "allow",
+      "exec *": "allow",
+
+      // === OpenCode itself ===
+      "opencode *": "allow"
+    }
   },
 
   // ---------------------------------------------------------------
