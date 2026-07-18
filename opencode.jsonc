@@ -28,7 +28,8 @@
   // Supports glob patterns. These are appended to the system prompt.
   "instructions": [
     "CONTRIBUTING.md",
-    "docs/guidelines.md"
+    "docs/guidelines.md",
+    "skills/cli-output-contract/SKILL.md"
   ],
 
   // ---------------------------------------------------------------
