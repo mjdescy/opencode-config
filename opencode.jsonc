@@ -88,7 +88,7 @@
     "architect": {
       "description": "Design review: structure, patterns, technology choices (any language)",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-pro",
+      "model": "opencode-go/glm-5.2",
       "prompt": "{file:prompts/architect.md}",
       "tools": {
         "write": false,
