@@ -36,21 +36,21 @@
   // Agents
   // ---------------------------------------------------------------
   "agent": {
-    "deepseek-flash": {
-      "description": "Primary agent. Fast, cheap orchestration for routine engineering work.",
+    "coordinator": {
+      "description": "Primary orchestrator. Fast, cheap dispatching for routine engineering work.",
       "mode": "primary",
       "model": "opencode-go/deepseek-v4-flash",
       "steps": 30,
-      "prompt": "{file:prompts/deepseek-flash.md}"
+      "prompt": "{file:prompts/coordinator.md}"
     },
-    "glm-advisor": {
+    "advisor": {
       "description": "Strategic advisor for second opinions, plan critique, and architecture tradeoffs.",
       "mode": "subagent",
       "hidden": true,
       "model": "opencode-go/glm-5.2",
       "steps": 15,
       "temperature": 0.3,
-      "prompt": "{file:prompts/glm-advisor.md}",
+      "prompt": "{file:prompts/advisor.md}",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -65,84 +65,84 @@
         "todowrite": "deny"
       }
     },
-    "dotnet-research": {
-      "description": "Finds answers in official .NET docs, MSDN, and canonical sources",
+    "researcher": {
+      "description": "Finds answers in official docs, package registries, and canonical sources",
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-flash",
-      "prompt": "You are a .NET/C# research assistant. Your primary task is to answer technical questions accurately. Prefer official sources: learn.microsoft.com, github.com/dotnet, and NuGet package READMEs. When referencing APIs, include the namespace and target framework (e.g., .NET 10). Avoid third-party blogs and outdated StackOverflow answers unless no canonical source exists. Be concise — give the answer first, then cite your source.",
+      "prompt": "{file:prompts/researcher.md}",
       "tools": {
         "write": false,
         "edit": false
       }
     },
-    "dotnet-code-reviewer": {
-      "description": "Reviews C# code for conventions, security, performance, and maintainability",
+    "code-reviewer": {
+      "description": "Reviews code for conventions, security, performance, and maintainability (any language)",
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-pro",
-      "prompt": "You are a C# code reviewer. Review code against these conventions: PascalCase types/methods, _camelCase private fields, I-prefixed interfaces, file-scoped namespaces, primary constructors (C# 12+), expression-bodied members for single-line methods, pattern matching over if-is-cast chains, record types for immutable data, System.Text.Json over Newtonsoft. Flag: #region usage, magic numbers/strings, missing readonly, 'Utility'/'Helper' class names, out/ref parameters, methods with >3 parameters. Also check for security issues (SQL injection, hardcoded secrets), performance (boxing, unnecessary allocations, async void), and maintainability (long methods, deep nesting, missing XML docs on public APIs).",
+      "prompt": "{file:prompts/code-reviewer.md}",
       "tools": {
         "write": false,
         "edit": false
       }
     },
-    "dotnet-debug": {
-      "description": "Methodical .NET debugging with diagnostic tooling expertise",
+    "architect": {
+      "description": "Design review: structure, patterns, technology choices (any language)",
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-pro",
-      "prompt": "You are a .NET debugging expert. Investigate errors methodically using this workflow: (1) Read the full exception message and stack trace — identify the exact line, exception type, and inner exceptions. (2) Check project/config files (.csproj, .slnx, appsettings.json) for misconfiguration. (3) For runtime issues, suggest relevant dotnet diagnostic commands: `dotnet trace` for performance, `dotnet dump` for crash analysis, `dotnet counters` for metrics, `dotnet symbol` for symbol resolution. (4) Common .NET pitfalls to check: DI service registration/lifetime mismatches, async-await deadlocks (missing ConfigureAwait or sync-over-async), null-reference from uninitialized DI dependencies, HttpClient misuse (not using IHttpClientFactory), DbContext threading issues, swallowed exceptions from async void. (5) Propose a minimal reproduction and targeted fix. Do NOT make broad refactors — fix the root cause surgically.",
+      "prompt": "{file:prompts/architect.md}",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+    "debugger": {
+      "description": "Methodical debugging with diagnostic tooling expertise (any language)",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-pro",
+      "prompt": "{file:prompts/debugger.md}",
       "tools": {
         "write": false,
         "edit": false,
         "bash": true
       }
     },
-    "dotnet-test": {
-      "description": "Generates and fixes xUnit tests following AAA pattern with NSubstitute/Moq",
+    "test": {
+      "description": "Generates and fixes tests following language conventions (any language)",
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-pro",
-      "prompt": "You are a C# testing specialist. Write xUnit tests following Arrange-Act-Assert. Use NSubstitute for mocking (preferred) or Moq as fallback. Conventions: one assertion per test when practical, test method names in `MethodName_Scenario_ExpectedBehavior` format, use `Theory` with `InlineData` for parameterized cases, `Fact` for single-case. Cover: happy path, null/empty inputs, boundary values, and expected exceptions. For existing test failures: read the test and the code under test, identify the mismatch, and suggest a minimal fix. Run `dotnet test` to verify after making changes.",
+      "prompt": "{file:prompts/test.md}",
       "tools": {
         "write": true,
         "edit": true,
         "bash": true
       }
     },
-    "dotnet-refactor": {
-      "description": "Applies C# conventions and modernizes code without changing behavior",
+    "refactor": {
+      "description": "Modernizes code without changing behavior (any language)",
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-pro",
-      "prompt": "You are a C# refactoring specialist. Modernize code to follow these conventions WITHOUT changing external behavior: file-scoped namespaces, primary constructors (C# 12+), expression-bodied members for single-line methods/properties, pattern matching instead of if-is-cast chains, collection expressions (`[1, 2, 3]`), null-conditional operators (`?.`, `??`, `??=`), `init` over `set`, `readonly` where possible, `record`/`readonly struct` for value types. Remove: #region blocks, magic numbers (extract named constants), 'Utility'/'Helper' suffixes, out/ref parameters (use tuples). Keep methods small (≤3 parameters; introduce parameter objects if needed). Always run `dotnet build` after refactoring to verify no breaks.",
+      "prompt": "{file:prompts/refactor.md}",
       "tools": {
         "write": true,
         "edit": true,
         "bash": true
       }
     },
-    "dotnet-document": {
-      "description": "Generates XML doc comments, READMEs, and API documentation",
+    "documenter": {
+      "description": "Generates API documentation, READMEs, and inline comments (any language)",
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-flash",
-      "prompt": "You are a documentation specialist for C# projects. Generate XML doc comments (`<summary>`, `<param>`, `<returns>`, `<exception>`, `<remarks>`) on all public and internal APIs. Explain **why**, not **what** — describe intent, side effects, and usage context. For README files: include build/run instructions, project structure overview, and configuration details. Use the conventions: solution layout in `src/` and `tests/`, `dotnet` CLI commands for all instructions. Do NOT modify code logic — only add or improve documentation.",
+      "prompt": "{file:prompts/documenter.md}",
       "tools": {
         "write": true,
         "edit": true
       }
     },
-    "dotnet-architect": {
-      "description": "Design review: DI, project structure, patterns, and technology choices",
-      "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-pro",
-      "prompt": "You are a .NET architect. Review and advise on: solution structure (src/tests layout, feature-folder vs layer organization), dependency injection (Microsoft.Extensions.DependencyInjection, lifetime scoping, constructor injection), design patterns (when to use record vs class vs struct, Mediator/Command pattern, Repository/UoW), project references vs NuGet packages, and technology fit (e.g., DuckDB.NET for embedded analytics, Serilog for logging, FluentValidation for input validation). Flag: circular dependencies, service locator anti-pattern, leaking EF Core entities to presentation layer, missing abstractions. Recommend specific, actionable improvements with code examples. Do NOT edit files — provide advice only.",
-      "tools": {
-        "write": false,
-        "edit": false
-      }
-    },
-    "dotnet-shell": {
-      "description": "Runs dotnet CLI and shell commands safely without editing files",
+    "shell": {
+      "description": "Runs CLI commands safely without editing files (any language ecosystem)",
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-flash",
-      "prompt": "You are a .NET CLI operator. Run dotnet commands safely: `dotnet build`, `dotnet test`, `dotnet format`, `dotnet run`, `dotnet watch`, `dotnet clean`, `dotnet restore`, `dotnet publish`, `dotnet outdated` (if installed). Explain what each command does before running it. For test failures: surface the failing test names and error messages clearly. For build errors: group by project and show the error code + line. Never edit or write files — you only run commands and report results.",
+      "prompt": "{file:prompts/shell.md}",
       "tools": {
         "write": false,
         "edit": false,
@@ -151,6 +151,7 @@
     },
     "git": {
       "description": "Generates conventional commits, reviews diffs, and crafts PR descriptions",
+      "mode": "subagent",
       "model": "opencode-go/deepseek-v4-flash",
       "prompt": "You are a Git commit specialist. Generate conventional commit messages in the format: `type(scope): description` where type is one of: feat, fix, refactor, test, docs, chore, perf, style. Keep the summary ≤72 characters, body wrapped at 72 chars. When reviewing a diff: summarize what changed and why (infer intent from the code), flag any files that seem unrelated to the stated change (accidental inclusions), and note missing test coverage. For PR descriptions: use a template with Summary, Changes, Testing, and Screenshots/Notes sections.",
       "tools": {
@@ -158,22 +159,11 @@
         "edit": false,
         "bash": true
       }
-    },
-    "duckdb-data": {
-      "description": "Helps with DuckDB.NET, ClosedXML, and data pipeline code",
-      "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
-      "prompt": "You are a C# data-access specialist. Assist with: DuckDB.NET for embedded analytical queries (prefer over SQLite for OLAP workloads), ClosedXML for Excel .xlsx read/write, System.Text.Json for serialization, and ADO.NET/EF Core for relational data. When writing data code: use async APIs where available, parameterize all SQL (never concatenate user input), dispose IDisposable resources with `await using`, and consider IAsyncEnumerable<T> for streaming large result sets. For Excel: use ClosedXML's fluent API, handle empty cells and type coercion gracefully.",
-      "tools": {
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
     }
   },
 
   // Default agent to use when none is specified
-  "default_agent": "deepseek-flash",
+  "default_agent": "coordinator",
 
   // ---------------------------------------------------------------
   // Custom Slash Commands
@@ -183,7 +173,7 @@
     "test": {
       "template": "Run `dotnet test` with detailed output. For any failures: show the failing test name, expected vs actual, and the relevant source code. Suggest a minimal fix.",
       "description": "Run .NET tests and diagnose failures",
-      "agent": "dotnet-test"
+      "agent": "test"
     },
     "lint": {
       "template": "Run `dotnet format` and `dotnet analyzers` on the current project. Show warnings and errors, then fix them.",

@@ -102,3 +102,83 @@ description: Use when working with C# code, .cs files, .csproj, .slnx, .sln, or 
 - Always include `--json` for machine-readable output
 - Prefer `init` subcommand for configuration/project setup
 - Support both file input and stdin
+
+## Security & Performance
+
+### Security Checklist
+- **SQL Injection**: Always parameterize SQL queries. Never concatenate user input into SQL strings.
+- **Hardcoded secrets**: Never store API keys, connection strings, or passwords in source code. Use `User Secrets`, environment variables, or a secrets manager.
+- **Input validation**: Validate all external input. Use `FluentValidation` or `System.ComponentModel.DataAnnotations`.
+- **XSS/ Injection**: Encode output for the target context (HTML, JSON, SQL). Use `System.Web.HttpUtility` or Razor's default encoding.
+- **Dependency scanning**: Run `dotnet list package --vulnerable` to check for known vulnerabilities.
+- **Secure defaults**: Opt in to security features explicitly (e.g., require HTTPS, anti-forgery tokens).
+
+### Performance Checklist
+- **Boxing**: Avoid boxing value types. Use generic collections (`List<int>` not `ArrayList`). Prefer `IEquatable<T>` on structs.
+- **Allocations**: Prefer `ArrayPool<T>` for temporary large arrays. Use `StringBuilder` for string concatenation in loops. Use `record struct` for small, short-lived value types.
+- **Async**: Never use `async void` (except for event handlers). Always `await` or `Task.WhenAll` async calls. Use `ConfigureAwait(false)` in library code. Use `ValueTask<T>` for hot-path async methods that often complete synchronously.
+- **LINQ**: Be aware of multiple enumeration. Use `.ToList()` or `.ToArray()` to materialize if iterating multiple times. Prefer `Any()` over `Count() > 0`.
+- **DbContext**: Use short-lived DbContext instances. Avoid tracking too many entities. Use `AsNoTracking()` for read-only queries. Use `ExecuteUpdate`/`ExecuteDelete` for bulk operations (EF Core 7+).
+- **HttpClient**: Use `IHttpClientFactory` and typed clients. Never wrap `HttpClient` in a `using` block.
+
+## Data Pipeline Patterns
+
+### DuckDB.NET
+```csharp
+using DuckDB.NET.Data;
+
+await using var conn = new DuckDBConnection("DataSource=:memory:");
+await conn.OpenAsync();
+
+await using var cmd = conn.CreateCommand();
+cmd.CommandText = "SELECT count(*) FROM read_csv_auto('data.csv')";
+var count = (long)(await cmd.ExecuteScalarAsync()!);
+```
+
+- Prefer DuckDB over SQLite for analytical/OLAP workloads
+- Use `read_csv_auto`, `read_parquet`, `read_json_auto` for direct file queries
+- Parameterize all query strings with `DuckDBParameter`
+- Use `COPY` for bulk data loading
+- Use `CREATE OR REPLACE TABLE ... AS SELECT` for ETL patterns
+
+### ClosedXML (Excel)
+```csharp
+using ClosedXML.Excel;
+
+using var workbook = new XLWorkbook();
+var ws = workbook.Worksheets.Add("Sheet1");
+ws.Cell("A1").Value = "Hello";
+ws.Cell("B1").Value = 42;
+ws.RangeUsed()?.SetAutoFilter();
+workbook.SaveAs("output.xlsx");
+```
+
+- Use ClosedXML's fluent API where possible
+- Handle empty cells with `.IsEmpty()` checks
+- Use `TryGetValue<T>()` for type-coercion-safe reads
+- Prefer `XLWorkbook` in a `using` statement to ensure proper disposal
+- For large files, stream rows with `IXLRangeRows` rather than loading all cells at once
+
+### System.Text.Json
+```csharp
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+var options = new JsonSerializerOptions
+{
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    WriteIndented = false
+};
+var json = JsonSerializer.Serialize(data, options);
+```
+
+- Prefer `System.Text.Json` over Newtonsoft for new code
+- Use `[JsonPropertyName("name")]` for property mapping
+- Use `JsonSerializerOptions` with `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`
+- Use `Utf8JsonWriter` for high-performance streaming write
+
+### Async Data Access
+- Use `await using` for `IDisposable` resources in async context
+- Use `IAsyncEnumerable<T>` for streaming large result sets from databases
+- Use `await foreach` to consume `IAsyncEnumerable<T>` sequences
+- Prefer `Npgsql` for PostgreSQL, `Microsoft.Data.SqlClient` for SQL Server
