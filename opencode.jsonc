@@ -6,10 +6,10 @@
   // ---------------------------------------------------------------
   // Which AI model to use as the primary "brain".
   // Format: "provider/model-name"
-  "model": "opencode-go/deepseek-v4-pro",
+  "model": "opencode/deepseek-v4-pro",
 
   // Smaller/cheaper model for lightweight tasks (title generation, etc.)
-  "small_model": "opencode-go/deepseek-v4-flash",
+  "small_model": "opencode/deepseek-v4-flash",
 
   // Provider-specific options (timeouts, API keys via env vars, etc.)
   // "provider": {
@@ -39,7 +39,7 @@
     "coordinator": {
       "description": "Primary orchestrator. Fast, cheap dispatching for routine engineering work.",
       "mode": "primary",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "steps": 30,
       "prompt": "{file:prompts/coordinator.md}"
     },
@@ -47,7 +47,7 @@
       "description": "Strategic advisor for second opinions, plan critique, and architecture tradeoffs.",
       "mode": "subagent",
       "hidden": true,
-      "model": "opencode-go/glm-5.2",
+      "model": "opencode/glm-5.2",
       "steps": 15,
       "temperature": 0.3,
       "prompt": "{file:prompts/advisor.md}",
@@ -68,96 +68,79 @@
     "researcher": {
       "description": "Finds answers in official docs, package registries, and canonical sources",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "prompt": "{file:prompts/researcher.md}",
-      "tools": {
-        "write": false,
-        "edit": false
+      "permission": {
+        "edit": "deny",
+        "write": "deny"
       }
     },
     "code-reviewer": {
       "description": "Reviews code for conventions, security, performance, and maintainability (any language)",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-pro",
+      "model": "opencode/deepseek-v4-pro",
       "prompt": "{file:prompts/code-reviewer.md}",
-      "tools": {
-        "write": false,
-        "edit": false
+      "permission": {
+        "edit": "deny",
+        "write": "deny"
       }
     },
     "architect": {
       "description": "Design review: structure, patterns, technology choices (any language)",
       "mode": "subagent",
-      "model": "opencode-go/glm-5.2",
+      "model": "opencode/glm-5.2",
       "prompt": "{file:prompts/architect.md}",
-      "tools": {
-        "write": false,
-        "edit": false
+      "permission": {
+        "edit": "deny",
+        "write": "deny"
       }
     },
     "debugger": {
       "description": "Methodical debugging with diagnostic tooling expertise (any language)",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-pro",
+      "model": "opencode/deepseek-v4-pro",
       "prompt": "{file:prompts/debugger.md}",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": true
+      "permission": {
+        "edit": "deny",
+        "write": "deny"
       }
     },
     "test": {
       "description": "Generates and fixes tests following language conventions (any language)",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-pro",
-      "prompt": "{file:prompts/test.md}",
-      "tools": {
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
+      "model": "opencode/deepseek-v4-pro",
+      "prompt": "{file:prompts/test.md}"
     },
     "refactor": {
       "description": "Modernizes code without changing behavior (any language)",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-pro",
-      "prompt": "{file:prompts/refactor.md}",
-      "tools": {
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
+      "model": "opencode/deepseek-v4-pro",
+      "prompt": "{file:prompts/refactor.md}"
     },
     "documenter": {
       "description": "Generates API documentation, READMEs, and inline comments (any language)",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
-      "prompt": "{file:prompts/documenter.md}",
-      "tools": {
-        "write": true,
-        "edit": true
-      }
+      "model": "opencode/deepseek-v4-flash",
+      "prompt": "{file:prompts/documenter.md}"
     },
     "shell": {
       "description": "Runs CLI commands safely without editing files (any language ecosystem)",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "prompt": "{file:prompts/shell.md}",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": true
+      "permission": {
+        "edit": "deny",
+        "write": "deny"
       }
     },
     "git": {
       "description": "Generates conventional commits, reviews diffs, and crafts PR descriptions",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "prompt": "You are a Git commit specialist. Generate conventional commit messages in the format: `type(scope): description` where type is one of: feat, fix, refactor, test, docs, chore, perf, style. Keep the summary ≤72 characters, body wrapped at 72 chars. When reviewing a diff: summarize what changed and why (infer intent from the code), flag any files that seem unrelated to the stated change (accidental inclusions), and note missing test coverage. For PR descriptions: use a template with Summary, Changes, Testing, and Screenshots/Notes sections.",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": true
+      "permission": {
+        "edit": "deny",
+        "write": "deny"
       }
     }
   },
