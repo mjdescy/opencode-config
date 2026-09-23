@@ -9,7 +9,7 @@
   "model": "opencode/deepseek-v4-pro",
 
   // Smaller/cheaper model for lightweight tasks (title generation, etc.)
-  "small_model": "opencode/deepseek-v4-flash",
+  "small_model": "opencode/deepseek-v4.1-flash",
 
   // Provider-specific options (timeouts, API keys via env vars, etc.)
   // "provider": {
@@ -37,9 +37,9 @@
   // ---------------------------------------------------------------
   "agent": {
     "coordinator": {
-      "description": "Primary orchestrator. Fast, cheap dispatching for routine engineering work.",
+      "description": "Primary orchestrator. Smart planning and dispatching for engineering work.",
       "mode": "primary",
-      "model": "opencode/deepseek-v4-flash",
+      "model": "opencode/glm-5.3",
       "steps": 30,
       "prompt": "{file:prompts/coordinator.md}"
     },
@@ -68,7 +68,7 @@
     "researcher": {
       "description": "Finds answers in official docs, package registries, and canonical sources",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "{file:prompts/researcher.md}",
       "permission": {
         "edit": "deny",
@@ -120,13 +120,13 @@
     "documenter": {
       "description": "Generates API documentation, READMEs, and inline comments (any language)",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "{file:prompts/documenter.md}"
     },
     "shell": {
       "description": "Runs CLI commands safely without editing files (any language ecosystem)",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "{file:prompts/shell.md}",
       "permission": {
         "edit": "deny",
@@ -136,7 +136,7 @@
     "git": {
       "description": "Generates conventional commits, reviews diffs, and crafts PR descriptions",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "You are a Git commit specialist. Generate conventional commit messages in the format: `type(scope): description` where type is one of: feat, fix, refactor, test, docs, chore, perf, style. Keep the summary ≤72 characters, body wrapped at 72 chars. When reviewing a diff: summarize what changed and why (infer intent from the code), flag any files that seem unrelated to the stated change (accidental inclusions), and note missing test coverage. For PR descriptions: use a template with Summary, Changes, Testing, and Screenshots/Notes sections.",
       "permission": {
         "edit": "deny",
