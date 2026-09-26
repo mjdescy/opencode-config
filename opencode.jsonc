@@ -6,7 +6,7 @@
   // ---------------------------------------------------------------
   // Which AI model to use as the primary "brain".
   // Format: "provider/model-name"
-  "model": "opencode/deepseek-v4-pro",
+  "model": "opencode/deepseek-v4.1-flash",
 
   // Smaller/cheaper model for lightweight tasks (title generation, etc.)
   "small_model": "opencode/deepseek-v4.1-flash",
@@ -39,7 +39,7 @@
     "coordinator": {
       "description": "Primary orchestrator. Smart planning and dispatching for engineering work.",
       "mode": "primary",
-      "model": "opencode/glm-5.3",
+      "model": "opencode/deepseek-v4.1-flash",
       "steps": 30,
       "prompt": "{file:prompts/coordinator.md}"
     },
@@ -47,7 +47,7 @@
       "description": "Strategic advisor for second opinions, plan critique, and architecture tradeoffs.",
       "mode": "subagent",
       "hidden": true,
-      "model": "opencode/glm-5.2",
+      "model": "opencode/big-pickle",
       "steps": 15,
       "temperature": 0.3,
       "prompt": "{file:prompts/advisor.md}",
@@ -78,7 +78,7 @@
     "code-reviewer": {
       "description": "Reviews code for conventions, security, performance, and maintainability (any language)",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-pro",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "{file:prompts/code-reviewer.md}",
       "permission": {
         "edit": "deny",
@@ -88,7 +88,7 @@
     "architect": {
       "description": "Design review: structure, patterns, technology choices (any language)",
       "mode": "subagent",
-      "model": "opencode/glm-5.2",
+      "model": "opencode/big-pickle",
       "prompt": "{file:prompts/architect.md}",
       "permission": {
         "edit": "deny",
@@ -98,7 +98,7 @@
     "debugger": {
       "description": "Methodical debugging with diagnostic tooling expertise (any language)",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-pro",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "{file:prompts/debugger.md}",
       "permission": {
         "edit": "deny",
@@ -108,13 +108,13 @@
     "test": {
       "description": "Generates and fixes tests following language conventions (any language)",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-pro",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "{file:prompts/test.md}"
     },
     "refactor": {
       "description": "Modernizes code without changing behavior (any language)",
       "mode": "subagent",
-      "model": "opencode/deepseek-v4-pro",
+      "model": "opencode/deepseek-v4.1-flash",
       "prompt": "{file:prompts/refactor.md}"
     },
     "documenter": {
