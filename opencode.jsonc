@@ -139,6 +139,25 @@
       "dirname *": "allow",
       "basename *": "allow",
       "tree *": "allow",
+      // === File manipulations ===
+      "cp *": "allow",
+      "mv *": "allow",
+      "rm *": "allow",
+      "touch *": "allow",
+      // === Additional languages & tools ===
+      "python *": "allow",
+      "python3 *": "allow",
+      "pip *": "allow",
+      "pytest *": "allow",
+      "go *": "allow",
+      "tsc *": "allow",
+      "node *": "allow",
+      // === Archives & Text processing ===
+      "tar *": "allow",
+      "zip *": "allow",
+      "unzip *": "allow",
+      "sed *": "allow",
+      "awk *": "allow",
       // === Git ===
       "git *": "allow",
       // === Shell scripting ===
